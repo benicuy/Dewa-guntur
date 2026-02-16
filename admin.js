@@ -3,6 +3,15 @@ if (!currentUser || !currentUser.isAdmin) {
     window.location.href = 'index.html';
 }
 
+// Data VIP levels (sama dengan di auth.js)
+const vipLevels = {
+    0: { name: 'Reguler', luck: 5, price: 0, maxTopup: 10000, color: '#95a5a6' },
+    1: { name: 'VIP 1', luck: 10, price: 25000, maxTopup: 30000, color: '#3498db' },
+    2: { name: 'VIP 2', luck: 15, price: 75000, maxTopup: 150000, color: '#9b59b6' },
+    3: { name: 'VIP 3', luck: 20, price: 150000, maxTopup: 500000, color: '#f1c40f' },
+    4: { name: 'VIP 4', luck: 25, price: 600000, maxTopup: 1000000, color: '#e67e22' }
+};
+
 // Load admin data
 function loadAdminData() {
     loadUsers();
@@ -92,7 +101,7 @@ function loadUsers() {
 
 // Edit user VIP (manual by admin)
 function editUserVIP(userId) {
-    const newLevel = prompt('Masukkan level VIP baru (0-4):', '0');
+    const newLevel = prompt('Masukkan level VIP baru (0-4):\n0 = Reguler\n1 = VIP 1\n2 = VIP 2\n3 = VIP 3\n4 = VIP 4', '0');
     if (newLevel === null) return;
     
     const level = parseInt(newLevel);
@@ -106,6 +115,14 @@ function editUserVIP(userId) {
         users[userIndex].vipLevel = level;
         users[userIndex].luck = vipLevels[level].luck;
         localStorage.setItem('users', JSON.stringify(users));
+        
+        // Update currentUser jika sedang login
+        if (currentUser && currentUser.id === userId) {
+            currentUser.vipLevel = level;
+            currentUser.luck = vipLevels[level].luck;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+        
         loadUsers();
         showNotification(`User diupdate ke ${vipLevels[level].name}!`, 'success');
     }
@@ -113,7 +130,7 @@ function editUserVIP(userId) {
 
 // Delete user
 function deleteUser(userId) {
-    if (confirm('Yakin ingin menghapus user ini?')) {
+    if (confirm('Yakin ingin menghapus user ini? Semua data akan hilang!')) {
         users = users.filter(u => u.id !== userId);
         localStorage.setItem('users', JSON.stringify(users));
         loadUsers();
@@ -122,14 +139,213 @@ function deleteUser(userId) {
     }
 }
 
+// Load topups
+function loadTopups() {
+    const topupsList = document.getElementById('topupsList');
+    if (!topupsList) return;
+
+    topupsList.innerHTML = '';
+    
+    // Sort by date descending
+    topups.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    topups.forEach(topup => {
+        const tr = document.createElement('tr');
+        const date = new Date(topup.createdAt).toLocaleDateString('id-ID');
+        
+        let proofHtml = '-';
+        if (topup.proofUrl) {
+            if (topup.proofUrl.startsWith('data:image')) {
+                proofHtml = `<img src="${topup.proofUrl}" class="proof-thumbnail" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${topup.transferDate}')">`;
+            } else {
+                proofHtml = `<a href="#" class="proof-link" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${topup.transferDate}')">Lihat</a>`;
+            }
+        }
+        
+        tr.innerHTML = `
+            <td>${topup.username}</td>
+            <td>Rp ${topup.amount.toLocaleString('id-ID')}</td>
+            <td>${topup.method}</td>
+            <td>${topup.senderName}</td>
+            <td>${date}</td>
+            <td>${proofHtml}</td>
+            <td>
+                <span class="history-status ${topup.status === 'success' ? 'status-success' : topup.status === 'pending' ? 'status-pending' : 'status-failed'}">
+                    ${topup.status}
+                </span>
+            </td>
+            <td>
+                <div class="admin-actions">
+                    ${topup.status === 'pending' ? `
+                        <button class="admin-btn approve" onclick="approveTopup(${topup.id})">Approve</button>
+                        <button class="admin-btn reject" onclick="rejectTopup(${topup.id})">Reject</button>
+                    ` : '-'}
+                </div>
+            </td>
+        `;
+        topupsList.appendChild(tr);
+    });
+}
+
+// Approve topup
+function approveTopup(topupId) {
+    const topup = topups.find(t => t.id === topupId);
+    if (!topup) return;
+
+    // Update status
+    topup.status = 'success';
+    
+    // Tambah saldo user
+    const user = users.find(u => u.id === topup.userId);
+    if (user) {
+        user.balance = (user.balance || 0) + topup.amount;
+        
+        // Update history
+        const history = histories.find(h => h.userId === user.id && h.type === 'topup' && h.status === 'pending');
+        if (history) {
+            history.status = 'success';
+            history.description = `Top Up Rp ${topup.amount.toLocaleString('id-ID')} via ${topup.method} (Berhasil)`;
+        }
+    }
+
+    localStorage.setItem('topups', JSON.stringify(topups));
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('histories', JSON.stringify(histories));
+
+    loadTopups();
+    updateAdminStats();
+    showNotification('Top up berhasil diapprove!', 'success');
+}
+
+// Reject topup
+function rejectTopup(topupId) {
+    const topup = topups.find(t => t.id === topupId);
+    if (!topup) return;
+
+    topup.status = 'failed';
+    
+    // Update history
+    const history = histories.find(h => h.userId === topup.userId && h.type === 'topup' && h.status === 'pending');
+    if (history) {
+        history.status = 'failed';
+        history.description = `Top Up Rp ${topup.amount.toLocaleString('id-ID')} via ${topup.method} (Gagal)`;
+    }
+
+    localStorage.setItem('topups', JSON.stringify(topups));
+    localStorage.setItem('histories', JSON.stringify(histories));
+
+    loadTopups();
+    updateAdminStats();
+    showNotification('Top up ditolak!', 'error');
+}
+
+// Load withdraws
+function loadWithdraws() {
+    const withdrawsList = document.getElementById('withdrawsList');
+    if (!withdrawsList) return;
+
+    withdrawsList.innerHTML = '';
+    
+    // Sort by date descending
+    withdraws.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    withdraws.forEach(withdraw => {
+        const tr = document.createElement('tr');
+        const date = new Date(withdraw.createdAt).toLocaleDateString('id-ID');
+        
+        tr.innerHTML = `
+            <td>${withdraw.username}</td>
+            <td>Rp ${withdraw.amount.toLocaleString('id-ID')}</td>
+            <td>${withdraw.method}</td>
+            <td>${withdraw.accountNumber}</td>
+            <td>${withdraw.accountName}</td>
+            <td>${date}</td>
+            <td>
+                <span class="history-status ${withdraw.status === 'success' ? 'status-success' : withdraw.status === 'pending' ? 'status-pending' : 'status-failed'}">
+                    ${withdraw.status}
+                </span>
+            </td>
+            <td>
+                <div class="admin-actions">
+                    ${withdraw.status === 'pending' ? `
+                        <button class="admin-btn approve" onclick="approveWithdraw(${withdraw.id})">Approve</button>
+                        <button class="admin-btn reject" onclick="rejectWithdraw(${withdraw.id})">Reject</button>
+                    ` : '-'}
+                </div>
+            </td>
+        `;
+        withdrawsList.appendChild(tr);
+    });
+}
+
+// Approve withdraw
+function approveWithdraw(withdrawId) {
+    const withdraw = withdraws.find(w => w.id === withdrawId);
+    if (!withdraw) return;
+
+    withdraw.status = 'success';
+    
+    // Update history
+    const history = histories.find(h => h.userId === withdraw.userId && h.type === 'withdraw' && h.status === 'pending');
+    if (history) {
+        history.status = 'success';
+        history.description = `Withdraw Rp ${withdraw.amount.toLocaleString('id-ID')} via ${withdraw.method} (Berhasil)`;
+    }
+
+    localStorage.setItem('withdraws', JSON.stringify(withdraws));
+    localStorage.setItem('histories', JSON.stringify(histories));
+
+    loadWithdraws();
+    updateAdminStats();
+    showNotification('Withdraw berhasil diapprove!', 'success');
+}
+
+// Reject withdraw
+function rejectWithdraw(withdrawId) {
+    const withdraw = withdraws.find(w => w.id === withdrawId);
+    if (!withdraw) return;
+
+    withdraw.status = 'failed';
+    
+    // Kembalikan saldo user
+    const user = users.find(u => u.id === withdraw.userId);
+    if (user) {
+        user.balance = (user.balance || 0) + withdraw.amount;
+    }
+
+    // Update history
+    const history = histories.find(h => h.userId === withdraw.userId && h.type === 'withdraw' && h.status === 'pending');
+    if (history) {
+        history.status = 'failed';
+        history.description = `Withdraw Rp ${withdraw.amount.toLocaleString('id-ID')} via ${withdraw.method} (Gagal)`;
+    }
+
+    localStorage.setItem('withdraws', JSON.stringify(withdraws));
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('histories', JSON.stringify(histories));
+
+    loadWithdraws();
+    updateAdminStats();
+    showNotification('Withdraw ditolak! Saldo dikembalikan.', 'error');
+}
+
 // Load VIP requests
 function loadVIPRequests() {
     const vipsList = document.getElementById('vipsList');
-    if (!vipsList) return;
+    if (!vipsList) {
+        console.log('VIP list element not found');
+        return;
+    }
 
     const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
+    console.log('VIP Requests:', vipRequests); // Untuk debugging
     
     vipsList.innerHTML = '';
+    
+    if (vipRequests.length === 0) {
+        vipsList.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Tidak ada request VIP</td></tr>';
+        return;
+    }
     
     // Sort by date descending
     vipRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -137,33 +353,42 @@ function loadVIPRequests() {
     vipRequests.forEach(request => {
         const tr = document.createElement('tr');
         const date = new Date(request.createdAt).toLocaleDateString('id-ID');
-        const transferDate = new Date(request.transferDate).toLocaleDateString('id-ID');
+        const transferDate = request.transferDate ? new Date(request.transferDate).toLocaleDateString('id-ID') : '-';
+        
+        let methodDisplay = request.method || '-';
+        if (request.method === 'QRIS') {
+            methodDisplay = 'QRIS 📱';
+        } else if (request.method === 'DANA') {
+            methodDisplay = 'DANA 📱';
+        } else if (request.method === 'OVO') {
+            methodDisplay = 'OVO 📱';
+        }
         
         let proofHtml = '-';
         if (request.proofUrl) {
             if (request.proofUrl.startsWith('data:image')) {
-                proofHtml = `<img src="${request.proofUrl}" class="proof-thumbnail" onclick="viewVIPProof('${request.proofUrl}', '${request.username}', '${request.vipName}', '${request.amount}', '${request.method}', '${request.senderName}', '${transferDate}')">`;
+                proofHtml = `<img src="${request.proofUrl}" class="proof-thumbnail" onclick="viewProof('${request.proofUrl}', 'VIP', '${request.username}', '${request.amount}', '${methodDisplay}', '${request.senderName || '-'}', '${transferDate}')">`;
             } else {
-                proofHtml = `<a href="#" class="proof-link" onclick="viewVIPProof('${request.proofUrl}', '${request.username}', '${request.vipName}', '${request.amount}', '${request.method}', '${request.senderName}', '${transferDate}')">Lihat</a>`;
+                proofHtml = `<a href="#" class="proof-link" onclick="viewProof('${request.proofUrl}', 'VIP', '${request.username}', '${request.amount}', '${methodDisplay}', '${request.senderName || '-'}', '${transferDate}')">Lihat</a>`;
             }
         }
         
         tr.innerHTML = `
-            <td>${request.username}</td>
-            <td>${request.vipName}</td>
-            <td>Rp ${request.amount.toLocaleString('id-ID')}</td>
-            <td>${request.method}</td>
-            <td>${request.senderName}</td>
+            <td>${request.username || '-'}</td>
+            <td>${request.vipName || '-'}</td>
+            <td>Rp ${(request.amount || 0).toLocaleString('id-ID')}</td>
+            <td>${methodDisplay}</td>
+            <td>${request.senderName || '-'}</td>
             <td>${date}</td>
             <td>${proofHtml}</td>
             <td>
                 <span class="history-status ${request.status === 'success' ? 'status-success' : request.status === 'pending' ? 'status-pending' : 'status-failed'}">
-                    ${request.status}
+                    ${request.status || 'pending'}
                 </span>
             </td>
             <td>
                 <div class="admin-actions">
-                    ${request.status === 'pending' ? `
+                    ${(!request.status || request.status === 'pending') ? `
                         <button class="admin-btn approve" onclick="approveVIP(${request.id})">Approve</button>
                         <button class="admin-btn reject" onclick="rejectVIP(${request.id})">Reject</button>
                     ` : '-'}
@@ -174,16 +399,99 @@ function loadVIPRequests() {
     });
 }
 
-// View VIP proof
-function viewVIPProof(proofUrl, username, vipName, amount, method, senderName, transferDate) {
+// Approve VIP
+function approveVIP(requestId) {
+    console.log('Approving VIP request:', requestId); // Untuk debugging
+    
+    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
+    const requestIndex = vipRequests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) {
+        showNotification('Request tidak ditemukan!', 'error');
+        return;
+    }
+    
+    const request = vipRequests[requestIndex];
+    
+    // Update status
+    vipRequests[requestIndex].status = 'success';
+    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
+    
+    // Update user VIP level
+    const userIndex = users.findIndex(u => u.id === request.userId);
+    if (userIndex !== -1) {
+        users[userIndex].vipLevel = request.vipLevel;
+        users[userIndex].luck = request.luck || vipLevels[request.vipLevel].luck;
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // Update currentUser jika sedang login
+        if (currentUser && currentUser.id === request.userId) {
+            currentUser.vipLevel = request.vipLevel;
+            currentUser.luck = request.luck || vipLevels[request.vipLevel].luck;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+        
+        // Update history
+        const historyIndex = histories.findIndex(h => h.userId === request.userId && h.type === 'vip' && h.status === 'pending');
+        if (historyIndex !== -1) {
+            histories[historyIndex].status = 'success';
+            histories[historyIndex].description = `Pembelian ${request.vipName} - Berhasil (Disetujui Admin)`;
+            localStorage.setItem('histories', JSON.stringify(histories));
+        }
+        
+        showNotification(`✅ VIP ${request.vipName} untuk user ${request.username} telah disetujui!`, 'success');
+    } else {
+        showNotification('User tidak ditemukan!', 'error');
+    }
+    
+    // Reload data
+    loadVIPRequests();
+    updateAdminStats();
+}
+
+// Reject VIP
+function rejectVIP(requestId) {
+    console.log('Rejecting VIP request:', requestId); // Untuk debugging
+    
+    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
+    const requestIndex = vipRequests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) {
+        showNotification('Request tidak ditemukan!', 'error');
+        return;
+    }
+    
+    const request = vipRequests[requestIndex];
+    
+    // Update status
+    vipRequests[requestIndex].status = 'failed';
+    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
+    
+    // Update history
+    const historyIndex = histories.findIndex(h => h.userId === request.userId && h.type === 'vip' && h.status === 'pending');
+    if (historyIndex !== -1) {
+        histories[historyIndex].status = 'failed';
+        histories[historyIndex].description = `Pembelian ${request.vipName} - Ditolak Admin`;
+        localStorage.setItem('histories', JSON.stringify(histories));
+    }
+    
+    showNotification(`❌ VIP request ditolak!`, 'error');
+    
+    // Reload data
+    loadVIPRequests();
+    updateAdminStats();
+}
+
+// View proof (general function for all proofs)
+function viewProof(proofUrl, type, username, amount, method, senderName, transferDate) {
     const modal = document.getElementById('proofModal');
     const proofImage = document.getElementById('proofImage');
     const proofInfo = document.getElementById('proofInfo');
     
     proofImage.src = proofUrl;
     proofInfo.innerHTML = `
+        <p><strong>Tipe:</strong> ${type}</p>
         <p><strong>Username:</strong> ${username}</p>
-        <p><strong>VIP:</strong> ${vipName}</p>
         <p><strong>Jumlah:</strong> Rp ${parseInt(amount).toLocaleString('id-ID')}</p>
         <p><strong>Metode:</strong> ${method}</p>
         <p><strong>Pengirim:</strong> ${senderName}</p>
@@ -193,63 +501,6 @@ function viewVIPProof(proofUrl, username, vipName, amount, method, senderName, t
     modal.style.display = 'block';
 }
 
-// Approve VIP
-function approveVIP(requestId) {
-    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    const request = vipRequests.find(r => r.id === requestId);
-    
-    if (!request) return;
-    
-    // Update status
-    request.status = 'success';
-    
-    // Update user VIP level
-    const user = users.find(u => u.id === request.userId);
-    if (user) {
-        user.vipLevel = request.vipLevel;
-        user.luck = vipLevels[request.vipLevel].luck;
-        
-        // Update history
-        const history = histories.find(h => h.userId === user.id && h.type === 'vip' && h.status === 'pending');
-        if (history) {
-            history.status = 'success';
-            history.description = `Pembelian ${request.vipName} - Berhasil`;
-        }
-    }
-    
-    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('histories', JSON.stringify(histories));
-    
-    loadVIPRequests();
-    updateAdminStats();
-    showNotification(`VIP ${request.vipName} berhasil diapprove!`, 'success');
-}
-
-// Reject VIP
-function rejectVIP(requestId) {
-    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    const request = vipRequests.find(r => r.id === requestId);
-    
-    if (!request) return;
-    
-    request.status = 'failed';
-    
-    // Update history
-    const history = histories.find(h => h.userId === request.userId && h.type === 'vip' && h.status === 'pending');
-    if (history) {
-        history.status = 'failed';
-        history.description = `Pembelian ${request.vipName} - Ditolak`;
-    }
-    
-    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
-    localStorage.setItem('histories', JSON.stringify(histories));
-    
-    loadVIPRequests();
-    updateAdminStats();
-    showNotification('VIP request ditolak!', 'error');
-}
-
 // Close proof modal
 function closeProofModal() {
     document.getElementById('proofModal').style.display = 'none';
@@ -257,14 +508,30 @@ function closeProofModal() {
 
 // Show admin tab
 function showAdminTab(tab) {
+    console.log('Showing tab:', tab); // Untuk debugging
+    
     const tabs = document.querySelectorAll('.admin-tab');
     const panels = document.querySelectorAll('.admin-panel');
     
     tabs.forEach(t => t.classList.remove('active'));
     panels.forEach(p => p.classList.remove('active'));
     
-    document.querySelector(`[onclick="showAdminTab('${tab}')"]`).classList.add('active');
-    document.getElementById(`${tab}Panel`).classList.add('active');
+    const activeTab = document.querySelector(`[onclick="showAdminTab('${tab}')"]`);
+    const activePanel = document.getElementById(`${tab}Panel`);
+    
+    if (activeTab) activeTab.classList.add('active');
+    if (activePanel) activePanel.classList.add('active');
+    
+    // Reload data for the active tab
+    if (tab === 'vips') {
+        loadVIPRequests();
+    } else if (tab === 'topups') {
+        loadTopups();
+    } else if (tab === 'withdraws') {
+        loadWithdraws();
+    } else if (tab === 'users') {
+        loadUsers();
+    }
 }
 
 // Save settings
@@ -305,151 +572,27 @@ function loadSettings() {
     if (maxSpin) maxSpin.value = settings.maxSpin;
 }
 
-// ... (kode admin.js sebelumnya tetap sama, tambahkan fungsi ini)
+// Show notification
+function showNotification(message, type) {
+    // Gunakan fungsi dari auth.js jika ada
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    } else {
+        // Fallback notification
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
 
-// Approve VIP
-function approveVIP(requestId) {
-    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    const requestIndex = vipRequests.findIndex(r => r.id === requestId);
-    
-    if (requestIndex === -1) return;
-    
-    const request = vipRequests[requestIndex];
-    
-    // Update status
-    vipRequests[requestIndex].status = 'success';
-    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
-    
-    // Update user VIP level
-    const userIndex = users.findIndex(u => u.id === request.userId);
-    if (userIndex !== -1) {
-        users[userIndex].vipLevel = request.vipLevel;
-        users[userIndex].luck = request.luck;
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // Update currentUser jika sedang login
-        if (currentUser && currentUser.id === request.userId) {
-            currentUser.vipLevel = request.vipLevel;
-            currentUser.luck = request.luck;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        }
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
-    
-    // Update history
-    const historyIndex = histories.findIndex(h => h.userId === request.userId && h.type === 'vip' && h.status === 'pending');
-    if (historyIndex !== -1) {
-        histories[historyIndex].status = 'success';
-        histories[historyIndex].description = `Pembelian ${request.vipName} - Berhasil (Disetujui Admin)`;
-        localStorage.setItem('histories', JSON.stringify(histories));
-    }
-    
-    // Notifikasi ke user (simulasi)
-    showNotification(`✅ VIP ${request.vipName} untuk user ${request.username} telah disetujui!`, 'success');
-    
-    // Reload data
-    loadVIPRequests();
-    updateAdminStats();
 }
 
-// Reject VIP
-function rejectVIP(requestId) {
-    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    const requestIndex = vipRequests.findIndex(r => r.id === requestId);
-    
-    if (requestIndex === -1) return;
-    
-    const request = vipRequests[requestIndex];
-    
-    // Update status
-    vipRequests[requestIndex].status = 'failed';
-    localStorage.setItem('vipRequests', JSON.stringify(vipRequests));
-    
-    // Update history
-    const historyIndex = histories.findIndex(h => h.userId === request.userId && h.type === 'vip' && h.status === 'pending');
-    if (historyIndex !== -1) {
-        histories[historyIndex].status = 'failed';
-        histories[historyIndex].description = `Pembelian ${request.vipName} - Ditolak Admin`;
-        localStorage.setItem('histories', JSON.stringify(histories));
-    }
-    
-    showNotification(`❌ VIP request ditolak!`, 'error');
-    
-   }
-   // Di fungsi loadVIPRequests, update bagian tampilan method
-// ... (kode admin.js sebelumnya)
-
-// Load VIP requests
-function loadVIPRequests() {
-    const vipsList = document.getElementById('vipsList');
-    if (!vipsList) return;
-
-    const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    
-    vipsList.innerHTML = '';
-    
-    // Sort by date descending
-    vipRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    vipRequests.forEach(request => {
-        const tr = document.createElement('tr');
-        const date = new Date(request.createdAt).toLocaleDateString('id-ID');
-        const transferDate = new Date(request.transferDate).toLocaleDateString('id-ID');
-        
-        let methodDisplay = request.method;
-        if (request.method === 'QRIS') {
-            methodDisplay = 'QRIS 📱';
-        }
-        
-        let proofHtml = '-';
-        if (request.proofUrl) {
-            if (request.proofUrl.startsWith('data:image')) {
-                proofHtml = `<img src="${request.proofUrl}" class="proof-thumbnail" onclick="viewVIPProof('${request.proofUrl}', '${request.username}', '${request.vipName}', '${request.amount}', '${methodDisplay}', '${request.senderName}', '${transferDate}')">`;
-            } else {
-                proofHtml = `<a href="#" class="proof-link" onclick="viewVIPProof('${request.proofUrl}', '${request.username}', '${request.vipName}', '${request.amount}', '${methodDisplay}', '${request.senderName}', '${transferDate}')">Lihat</a>`;
-            }
-        }
-        
-        tr.innerHTML = `
-            <td>${request.username}</td>
-            <td>${request.vipName}</td>
-            <td>Rp ${request.amount.toLocaleString('id-ID')}</td>
-            <td>${methodDisplay}</td>
-            <td>${request.senderName}</td>
-            <td>${date}</td>
-            <td>${proofHtml}</td>
-            <td>
-                <span class="history-status ${request.status === 'success' ? 'status-success' : request.status === 'pending' ? 'status-pending' : 'status-failed'}">
-                    ${request.status}
-                </span>
-            </td>
-            <td>
-                <div class="admin-actions">
-                    ${request.status === 'pending' ? `
-                        <button class="admin-btn approve" onclick="approveVIP(${request.id})">Approve</button>
-                        <button class="admin-btn reject" onclick="rejectVIP(${request.id})">Reject</button>
-                    ` : '-'}
-                </div>
-            </td>
-        `;
-        vipsList.appendChild(tr);
-    });
-}
-
-// View VIP proof
-function viewVIPProof(proofUrl, username, vipName, amount, method, senderName, transferDate) {
-    const modal = document.getElementById('proofModal');
-    const proofImage = document.getElementById('proofImage');
-    const proofInfo = document.getElementById('proofInfo');
-    
-    proofImage.src = proofUrl;
-    proofInfo.innerHTML = `
-        <p><strong>Username:</strong> ${username}</p>
-        <p><strong>VIP:</strong> ${vipName}</p>
-        <p><strong>Jumlah:</strong> Rp ${parseInt(amount).toLocaleString('id-ID')}</p>
-        <p><strong>Metode:</strong> ${method}</p>
-        <p><strong>Pengirim:</strong> ${senderName}</p>
-        <p><strong>Tanggal Transfer:</strong> ${transferDate}</p>
-    `;
-    
-    modal.style.display = 'block';
-}
+// Inisialisasi admin page
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Admin page loaded'); // Untuk debugging
+    loadAdminData();
+    loadSettings();
+});
