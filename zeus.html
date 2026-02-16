@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeus Slot - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188 - Zeus Slot</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html">Beranda</a>
+            <a href="duofacai.html">Duo Facai</a>
+            <a href="zeus.html" class="active">Zeus</a>
+            <a href="domino.html">Domino</a>
+            <a href="spin.html">Spin</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="riwayat.html">Riwayat</a>
+            <a href="vip.html">VIP</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="vip-badge" id="vipDisplay">Reguler</span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="window.location.href='index.html'">Login</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="zeus-container">
+            <div class="zeus-header">
+                <div class="zeus-title">
+                    <h2>⚡ ZEUS SLOT ⚡</h2>
+                    <p>Game Dewa Olympus - Minimal VIP 1</p>
+                </div>
+                <div class="bet-control">
+                    <label>Taruhan (Rp):</label>
+                    <input type="number" id="betAmount" min="2000" max="50000" step="1000" value="2000">
+                </div>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <span>Menang</span>
+                        <strong id="winCount">0</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span>Kalah</span>
+                        <strong id="loseCount">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zeus Slot Machine -->
+            <div class="zeus-slot-machine">
+                <div class="zeus-reels" id="zeusReels">
+                    <!-- 5x3 grid akan diisi JavaScript -->
+                </div>
+
+                <div class="scatter-info">
+                    <span class="scatter-icon">⚡⚡</span>
+                    <span class="scatter-count" id="scatterCount">Scatter: 0</span>
+                    <span class="scatter-bonus">(3 Scatter = Free Spin)</span>
+                </div>
+            </div>
+
+            <div class="slot-controls">
+                <button class="slot-btn spin" onclick="spinZeus()" id="spinBtn">SPIN</button>
+                <button class="slot-btn reset" onclick="resetZeus()" id="resetBtn">Reset</button>
+            </div>
+
+            <!-- Game Result -->
+            <div class="game-result" id="gameResult" style="display: none;"></div>
+
+            <!-- Prize Table -->
+            <div class="prize-table">
+                <h3>Hadiah Zeus Slot</h3>
+                <div class="prize-grid">
+                    <div class="prize-item">
+                        <div class="symbol">⚡ Zeus</div>
+                        <div class="value">Rp 50.000</div>
+                    </div>
+                    <div class="prize-item">
+                        <div class="symbol">👑 Hera</div>
+                        <div class="value">Rp 40.000</div>
+                    </div>
+                    <div class="prize-item">
+                        <div class="symbol">🦉 Athena</div>
+                        <div class="value">Rp 30.000</div>
+                    </div>
+                    <div class="prize-item">
+                        <div class="symbol">🌊 Poseidon</div>
+                        <div class="value">Rp 25.000</div>
+                    </div>
+                    <div class="prize-item">
+                        <div class="symbol">💀 Hades</div>
+                        <div class="value">Rp 20.000</div>
+                    </div>
+                    <div class="prize-item">
+                        <div class="symbol">🌟 Wild</div>
+                        <div class="value">Ganti semua simbol</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIP Required Modal -->
+            <div id="vipModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeVIPModal()">&times;</span>
+                    <h3 style="color: #e74c3c;">⚠️ VIP Required ⚠️</h3>
+                    <p>Game Zeus hanya untuk VIP 1 ke atas!</p>
+                    <p>Upgrade VIP Anda sekarang untuk membuka game ini.</p>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="window.location.href='vip.html'">Upgrade VIP</button>
+                        <button class="btn btn-secondary" onclick="closeVIPModal()">Kembali</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/zeus.js"></script>
+</body>
+</html>

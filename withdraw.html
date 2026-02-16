@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html">Beranda</a>
+            <a href="spin.html">Spin</a>
+            <a href="mahjong.html">Mahjong</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html" class="active">Withdraw</a>
+            <a href="riwayat.html">Riwayat</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="window.location.href='index.html'">Login</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="withdraw-container">
+            <h2>Tarik Dana (Withdraw)</h2>
+            <p class="min-withdraw">Minimal Withdraw: Rp 50.000</p>
+            
+            <div class="withdraw-form">
+                <div class="form-group">
+                    <label>Jumlah Withdraw (Rp)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Minimal Rp 50.000" min="50000">
+                </div>
+                <div class="form-group">
+                    <label>Metode Penarikan</label>
+                    <select id="withdrawMethod">
+                        <option value="BCA">Bank BCA</option>
+                        <option value="Mandiri">Bank Mandiri</option>
+                        <option value="BRI">Bank BRI</option>
+                        <option value="BNI">Bank BNI</option>
+                        <option value="DANA">DANA</option>
+                        <option value="OVO">OVO</option>
+                        <option value="GoPay">GoPay</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nomor Rekening/EWallet</label>
+                    <input type="text" id="accountNumber" placeholder="Masukkan nomor rekening atau EWallet">
+                </div>
+                <div class="form-group">
+                    <label>Nama Pemilik Rekening</label>
+                    <input type="text" id="accountName" placeholder="Nama sesuai rekening">
+                </div>
+                <button class="btn btn-primary" onclick="submitWithdraw()">Ajukan Withdraw</button>
+            </div>
+
+            <div class="withdraw-info">
+                <h4>Informasi Penting:</h4>
+                <ul>
+                    <li>✅ Proses withdraw maksimal 1x24 jam</li>
+                    <li>✅ Minimal withdraw Rp 50.000</li>
+                    <li>✅ Maksimal withdraw Rp 10.000.000 per hari</li>
+                    <li>✅ Pastikan data rekening Anda benar</li>
+                    <li>✅ Admin akan memverifikasi sebelum memproses</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/withdraw.js"></script>
+</body>
+</html>

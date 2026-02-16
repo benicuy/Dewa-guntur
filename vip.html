@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .vip-card {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .vip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .vip-card .btn-beli {
+            background: white;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .vip-card .btn-beli:hover {
+            background: #f1c40f;
+            transform: scale(1.05);
+        }
+        .vip-card.vip1 .btn-beli { background: #3498db; color: white; }
+        .vip-card.vip2 .btn-beli { background: #9b59b6; color: white; }
+        .vip-card.vip3 .btn-beli { background: #f1c40f; color: #333; }
+        .vip-card.vip4 .btn-beli { background: #e67e22; color: white; }
+        
+        .qris-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .qris-image {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border-radius: 10px;
+        }
+        .qris-image:hover {
+            transform: scale(1.05);
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-option:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+        .payment-option.selected {
+            border: 2px solid #f1c40f;
+            background: #fff9e6;
+        }
+        .payment-option img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188 - VIP</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html">Beranda</a>
+            <a href="duofacai.html">Duo Facai</a>
+            <a href="zeus.html">Zeus</a>
+            <a href="domino.html">Domino</a>
+            <a href="spin.html">Spin</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="riwayat.html">Riwayat</a>
+            <a href="vip.html" class="active">VIP</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="vip-badge" id="vipDisplay">Reguler</span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="window.location.href='index.html'">Login</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="vip-container">
+            <h2>Upgrade VIP Anda</h2>
+            <p style="text-align: center; margin-bottom: 30px;">Naikkan level VIP untuk mendapatkan keuntungan lebih!</p>
+            
+            <!-- Info Pembayaran dengan QRIS -->
+            <div class="qris-section" style="margin-bottom: 30px;">
+                <h3>Pembayaran VIP</h3>
+                <p>Pilih metode pembayaran di bawah ini:</p>
+                
+                <!-- QRIS Option -->
+                <div class="payment-option" onclick="selectPayment('QRIS')" id="optionQRIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/QRIS_logo.svg/1200px-QRIS_logo.svg.png" alt="QRIS" style="width: 50px;">
+                    <div style="flex: 1;">
+                        <strong>QRIS</strong>
+                        <p style="color: #666; font-size: 12px;">Scan QR code dengan aplikasi pembayaran</p>
+                    </div>
+                </div>
+                
+                <!-- BCA Option -->
+                <div class="payment-option" onclick="selectPayment('BCA')" id="optionBCA">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/1200px-Bank_Central_Asia.svg.png" alt="BCA" style="width: 50px;">
+                    <div style="flex: 1;">
+                        <strong>Bank BCA</strong>
+                        <p style="color: #666; font-size: 12px;">No. Rekening: 1234567890</p>
+                    </div>
+                </div>
+                
+                <!-- DANA Option -->
+                <div class="payment-option" onclick="selectPayment('DANA')" id="optionDANA">
+                    <img src="https://play-lh.googleusercontent.com/8VPIuLcLdHuuFzh6ajwI6EMJrW0O-v1eZfWURG6l3aU_TxPQGzocu31lAS2qJq6fT-E" alt="DANA" style="width: 50px;">
+                    <div style="flex: 1;">
+                        <strong>DANA</strong>
+                        <p style="color: #666; font-size: 12px;">082210756431 a.n Dewa Guntur</p>
+                    </div>
+                </div>
+                
+                <!-- OVO Option -->
+                <div class="payment-option" onclick="selectPayment('OVO')" id="optionOVO">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/OVO_logo.svg/1200px-OVO_logo.svg.png" alt="OVO" style="width: 50px;">
+                    <div style="flex: 1;">
+                        <strong>OVO</strong>
+                        <p style="color: #666; font-size: 12px;">082210756431 a.n Dewa Guntur</p>
+                    </div>
+                </div>
+                
+                <!-- QRIS Display (hidden by default) -->
+                <div id="qrisDisplay" style="display: none; text-align: center; margin-top: 20px;">
+                    <h4>Scan QRIS Berikut:</h4>
+                    <div class="qris-container">
+                        <img src="https://cdn.phototourl.com/uploads/2026-02-16-7fbca8f1-68b1-4b62-a6fa-b6e36a0be7a7.jpg" 
+                             alt="QRIS Dewa Guntur188" 
+                             class="qris-image"
+                             onclick="openQRIS()">
+                        <p style="margin-top: 10px;">Klik gambar untuk memperbesar</p>
+                        <button class="btn-small" onclick="copyQRISLink()">Salin Link QRIS</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vip-cards" id="vipCards">
+                <!-- VIP cards akan diisi JavaScript -->
+            </div>
+
+            <!-- Form Pembayaran VIP -->
+            <div class="topup-form" id="paymentForm" style="display: none; margin-top: 30px; border: 3px solid #f1c40f;">
+                <h3 id="paymentTitle" style="color: #f1c40f;">Form Pembayaran VIP</h3>
+                
+                <!-- Selected Payment Method Info -->
+                <div id="selectedPaymentInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Metode Pembayaran:</strong> <span id="selectedMethod">-</span></p>
+                    <p><strong>Detail Pembayaran:</strong> <span id="paymentDetail">-</span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Level VIP yang Dipilih</label>
+                    <input type="text" id="selectedVIP" readonly style="background: #f8f9fa; font-weight: bold;">
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Pembayaran (Rp)</label>
+                    <input type="text" id="paymentAmount" readonly style="background: #f8f9fa; font-weight: bold; color: #27ae60;">
+                </div>
+                <div class="form-group">
+                    <label>Nama Pengirim</label>
+                    <input type="text" id="senderName" placeholder="Nama sesuai rekening/ewallet" required>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Transfer</label>
+                    <input type="date" id="transferDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Bukti Transfer / Screenshot QRIS</label>
+                    <div class="upload-area" onclick="document.getElementById('paymentProof').click()">
+                        <i>📷</i>
+                        <p>Klik untuk upload bukti pembayaran</p>
+                        <input type="file" id="paymentProof" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </div>
+                    <div id="imagePreview"></div>
+                </div>
+                <div class="form-group">
+                    <label>Catatan (Opsional)</label>
+                    <textarea id="notes" placeholder="Tambahkan catatan jika perlu"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitVIPPayment()" style="background: #f1c40f; color: #333; font-weight: bold;">KIRIM BUKTI PEMBAYARAN</button>
+                <button class="btn btn-secondary" onclick="cancelPayment()" style="margin-top: 10px;">Batal</button>
+            </div>
+
+            <div class="vip-info">
+                <h3>Keuntungan VIP:</h3>
+                <ul>
+                    <li>✅ Keberuntungan lebih tinggi (peluang menang besar)</li>
+                    <li>✅ Limit top up lebih besar</li>
+                    <li>✅ Buka game eksklusif</li>
+                    <li>✅ Bonus spesial setiap minggu</li>
+                    <li>✅ Prioritas withdraw</li>
+                </ul>
+                
+                <h3 style="margin-top: 20px;">Game berdasarkan VIP:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Harga</th>
+                            <th>Keberuntungan</th>
+                            <th>Max Top Up</th>
+                            <th>Game</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reguler</td>
+                            <td>Gratis</td>
+                            <td>5%</td>
+                            <td>Rp 10.000</td>
+                            <td>Duo Facai</td>
+                        </tr>
+                        <tr>
+                            <td>VIP 1</td>
+                            <td>Rp 25.000</td>
+                            <td>10%</td>
+                            <td>Rp 30.000</td>
+                            <td>Duo Facai, Zeus</td>
+                        </tr>
+                        <tr>
+                            <td>VIP 2</td>
+                            <td>Rp 75.000</td>
+                            <td>15%</td>
+                            <td>Rp 150.000</td>
+                            <td>Duo Facai, Zeus, Domino</td>
+                        </tr>
+                        <tr>
+                            <td>VIP 3</td>
+                            <td>Rp 150.000</td>
+                            <td>20%</td>
+                            <td>Rp 500.000</td>
+                            <td>Duo Facai, Zeus, Domino</td>
+                        </tr>
+                        <tr>
+                            <td>VIP 4</td>
+                            <td>Rp 600.000</td>
+                            <td>25%</td>
+                            <td>Rp 1.000.000+</td>
+                            <td>Duo Facai, Zeus, Domino, Spin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QRIS -->
+    <div id="qrisModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; text-align: center;">
+            <span class="close" onclick="closeQRISModal()">&times;</span>
+            <h3>Scan QRIS Dewa Guntur188</h3>
+            <img src="https://cdn.phototourl.com/uploads/2026-02-16-7fbca8f1-68b1-4b62-a6fa-b6e36a0be7a7.jpg" 
+                 alt="QRIS Dewa Guntur188" 
+                 style="width: 100%; max-width: 400px; margin: 20px auto;">
+            <p>Scan menggunakan aplikasi pembayaran (GoPay, OVO, DANA, Mobile Banking)</p>
+            <button class="btn btn-primary" onclick="closeQRISModal()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConfirmModal()">&times;</span>
+            <h3 id="confirmTitle" style="color: #f1c40f;">Konfirmasi Pembayaran VIP</h3>
+            <div id="confirmMessage" style="margin: 20px 0; text-align: left;"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" id="confirmBtn" style="background: #27ae60;">YA, KIRIM</button>
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/vip.js"></script>
+</body>
+</html>

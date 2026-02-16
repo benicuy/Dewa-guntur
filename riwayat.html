@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html">Beranda</a>
+            <a href="spin.html">Spin</a>
+            <a href="mahjong.html">Mahjong</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="riwayat.html" class="active">Riwayat</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="window.location.href='index.html'">Login</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="history-container">
+            <h2>Riwayat Transaksi</h2>
+            
+            <div class="history-filters">
+                <button class="filter-btn active" onclick="filterHistory('all')">Semua</button>
+                <button class="filter-btn" onclick="filterHistory('spin')">Spin</button>
+                <button class="filter-btn" onclick="filterHistory('mahjong')">Mahjong</button>
+                <button class="filter-btn" onclick="filterHistory('topup')">Top Up</button>
+                <button class="filter-btn" onclick="filterHistory('withdraw')">Withdraw</button>
+                <button class="filter-btn" onclick="filterHistory('prize')">Bonus</button>
+            </div>
+
+            <div class="history-list" id="historyList">
+                <!-- Riwayat akan ditampilkan di sini -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/riwayat.js"></script>
+</body>
+</html>

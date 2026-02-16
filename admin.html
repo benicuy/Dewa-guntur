@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188 - Admin</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="admin.html" class="active">Dashboard</a>
+            <a href="index.html">Home</a>
+        </div>
+        <div class="user-info">
+            <span id="adminName">Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-container">
+            <h2>Panel Admin Dewa Guntur188</h2>
+            
+            <!-- Statistik -->
+            <div class="admin-stats">
+                <div class="admin-card">
+                    <h3>Total Users</h3>
+                    <p id="totalUsers">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Total Saldo</h3>
+                    <p id="totalBalance">Rp 0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Total Spin</h3>
+                    <p id="totalSpinsAdmin">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Total Mahjong</h3>
+                    <p id="totalMahjongAdmin">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Pending Top Up</h3>
+                    <p id="pendingTopup">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Pending Withdraw</h3>
+                    <p id="pendingWithdraw">0</p>
+                </div>
+                <div class="admin-card">
+                    <h3>Pending VIP</h3>
+                    <p id="pendingVIP">0</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="showAdminTab('users')">Users</button>
+                <button class="admin-tab" onclick="showAdminTab('topups')">Top Up</button>
+                <button class="admin-tab" onclick="showAdminTab('withdraws')">Withdraw</button>
+                <button class="admin-tab" onclick="showAdminTab('vips')">VIP Requests</button>
+                <button class="admin-tab" onclick="showAdminTab('settings')">Pengaturan</button>
+            </div>
+
+            <!-- Users Panel -->
+            <div id="usersPanel" class="admin-panel active">
+                <h3>Manajemen User</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Saldo</th>
+                            <th>VIP Level</th>
+                            <th>Keberuntungan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList">
+                        <!-- Data user akan ditampilkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Top Ups Panel -->
+            <div id="topupsPanel" class="admin-panel">
+                <h3>Permintaan Top Up</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Jumlah</th>
+                            <th>Metode</th>
+                            <th>Pengirim</th>
+                            <th>Tanggal</th>
+                            <th>Bukti</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topupsList">
+                        <!-- Data top up akan ditampilkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Withdraws Panel -->
+            <div id="withdrawsPanel" class="admin-panel">
+                <h3>Permintaan Withdraw</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Jumlah</th>
+                            <th>Metode</th>
+                            <th>No Rekening</th>
+                            <th>Nama</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawsList">
+                        <!-- Data withdraw akan ditampilkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- VIP Requests Panel -->
+            <div id="vipsPanel" class="admin-panel">
+                <h3>Permintaan Upgrade VIP</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>VIP Level</th>
+                            <th>Jumlah</th>
+                            <th>Metode</th>
+                            <th>Pengirim</th>
+                            <th>Tanggal</th>
+                            <th>Bukti</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vipsList">
+                        <!-- Data VIP requests akan ditampilkan di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Settings Panel -->
+            <div id="settingsPanel" class="admin-panel">
+                <h3>Pengaturan Keberuntungan Player</h3>
+                <div class="form-group">
+                    <label>Default Luck Percentage (%)</label>
+                    <input type="number" id="defaultLuck" min="1" max="100" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Bonus 50x Spin (Rp)</label>
+                    <input type="number" id="bonusAmount" min="1000" value="2000">
+                </div>
+                <div class="form-group">
+                    <label>Minimal Spin (Rp)</label>
+                    <input type="number" id="minSpin" min="1000" value="10000">
+                </div>
+                <div class="form-group">
+                    <label>Maksimal Spin (Rp)</label>
+                    <input type="number" id="maxSpin" min="1000" value="500000">
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">Simpan Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Preview Bukti Pembayaran -->
+    <div id="proofModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; text-align: center;">
+            <span class="close" onclick="closeProofModal()">&times;</span>
+            <h3>Bukti Pembayaran</h3>
+            <img id="proofImage" src="" alt="Bukti Pembayaran" style="width: 100%; max-width: 600px; margin: 20px auto;">
+            <div id="proofInfo" style="margin-top: 20px; text-align: left;"></div>
+            <button class="btn btn-primary" onclick="closeProofModal()">Tutup</button>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

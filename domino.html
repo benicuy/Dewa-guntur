@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domino - Dewa Guntur188</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188 - Domino</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html">Beranda</a>
+            <a href="duofacai.html">Duo Facai</a>
+            <a href="zeus.html">Zeus</a>
+            <a href="domino.html" class="active">Domino</a>
+            <a href="spin.html">Spin</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="riwayat.html">Riwayat</a>
+            <a href="vip.html">VIP</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="vip-badge" id="vipDisplay">Reguler</span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="window.location.href='index.html'">Login</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="domino-container">
+            <div class="domino-header">
+                <div class="domino-title">
+                    <h2>🀄 DOMINO 🀄</h2>
+                    <p>Game Kartu Klasik - Minimal VIP 2</p>
+                </div>
+                <div class="bet-control">
+                    <label>Taruhan (Rp):</label>
+                    <input type="number" id="betAmount" min="5000" max="100000" step="5000" value="5000">
+                </div>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <span>Menang</span>
+                        <strong id="winCount">0</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span>Kalah</span>
+                        <strong id="loseCount">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domino Board -->
+            <div class="domino-board">
+                <div class="domino-table" id="dominoTable">
+                    <!-- Domino tiles akan diisi JavaScript -->
+                </div>
+            </div>
+
+            <!-- Player Hand -->
+            <div class="domino-hand" id="playerHand">
+                <!-- Player's tiles -->
+            </div>
+
+            <!-- Computer Hand (hidden) -->
+            <div class="domino-hand" id="computerHand" style="opacity: 0.3;">
+                <!-- Computer's tiles (hidden) -->
+            </div>
+
+            <div class="domino-controls">
+                <button class="domino-btn play" onclick="playDomino()" id="playBtn">Mainkan</button>
+                <button class="domino-btn pass" onclick="passDomino()" id="passBtn">Lewat</button>
+                <button class="domino-btn reset" onclick="resetDomino()" id="resetBtn">Game Baru</button>
+            </div>
+
+            <!-- Game Result -->
+            <div class="game-result" id="gameResult" style="display: none;"></div>
+
+            <!-- VIP Required Modal -->
+            <div id="vipModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeVIPModal()">&times;</span>
+                    <h3 style="color: #e74c3c;">⚠️ VIP Required ⚠️</h3>
+                    <p>Game Domino hanya untuk VIP 2 ke atas!</p>
+                    <p>Upgrade VIP Anda sekarang untuk membuka game ini.</p>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="window.location.href='vip.html'">Upgrade VIP</button>
+                        <button class="btn btn-secondary" onclick="closeVIPModal()">Kembali</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/domino.js"></script>
+</body>
+</html>

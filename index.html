@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dewa Guntur188 - 4 Games</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>⚡ Dewa Guntur188</h1>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="index.html" class="active">Beranda</a>
+            <a href="duofacai.html">Duo Facai</a>
+            <a href="zeus.html" class="vip-badge">Zeus</a>
+            <a href="domino.html" class="vip-badge">Domino</a>
+            <a href="spin.html" class="vip-badge vip-only">Spin</a>
+            <a href="topup.html">Top Up</a>
+            <a href="withdraw.html">Withdraw</a>
+            <a href="riwayat.html">Riwayat</a>
+            <a href="vip.html">VIP</a>
+        </div>
+        <div class="user-info" id="userInfo">
+            <span id="usernameDisplay"></span>
+            <span class="vip-badge" id="vipDisplay">Reguler</span>
+            <span class="balance" id="balanceDisplay">Rp 0</span>
+            <button class="login-btn" id="loginBtn" onclick="showAuthModal()">Login</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Selamat Datang di Dewa Guntur188</h2>
+            <p>4 Permainan Menarik dengan Hadiah Jutaan Rupiah!</p>
+            <p class="promo">🎉 DUO FACAI: Semua Bisa Main! 🎉</p>
+            <p class="promo">⚡ ZEUS: Minimal VIP 1 ⚡</p>
+            <p class="promo">🀄 DOMINO: Minimal VIP 2 🀄</p>
+            <p class="promo">🎡 SPIN: Hanya VIP 4 🎡</p>
+            <div class="hero-buttons">
+                <button class="btn btn-success" onclick="window.location.href='duofacai.html'">Duo Facai</button>
+                <button class="btn btn-warning" onclick="window.location.href='zeus.html'">Zeus</button>
+                <button class="btn btn-primary" onclick="window.location.href='domino.html'">Domino</button>
+                <button class="btn btn-danger" onclick="window.location.href='spin.html'">Spin</button>
+                <button class="btn btn-secondary" onclick="window.location.href='vip.html'">Upgrade VIP</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistik -->
+    <section class="stats">
+        <div class="stat-card">
+            <h3 id="totalPlayers">0</h3>
+            <p>Total Pemain</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalPrizes">Rp 0</h3>
+            <p>Total Hadiah</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalGames">0</h3>
+            <p>Total Game</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="vipPlayers">0</h3>
+            <p>VIP Players</p>
+        </div>
+    </section>
+
+    <!-- Cara Bermain -->
+    <section class="how-to-play">
+        <h2>Cara Bermain</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Register/Login</h3>
+                <p>Buat akun atau login untuk mulai bermain</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Top Up Saldo</h3>
+                <p>Isi saldo melalui QRIS, transfer bank, atau e-wallet</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Upgrade VIP</h3>
+                <p>Naikkan level VIP untuk buka game baru</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Main Game</h3>
+                <p>Pilih game sesuai level VIP Anda</p>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <h3>Withdraw</h3>
+                <p>Tarik kemenangan ke rekening atau e-wallet</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Games -->
+    <section class="featured-games">
+        <h2>Permainan Populer</h2>
+        <div class="games-grid">
+            <div class="game-card" onclick="window.location.href='duofacai.html'">
+                <div class="game-icon">🧧</div>
+                <h3>Duo Facai</h3>
+                <p>Game keberuntungan China - Semua bisa main!</p>
+                <span class="game-price">Mulai Rp 1.000</span>
+            </div>
+            <div class="game-card vip-required" onclick="window.location.href='zeus.html'">
+                <div class="vip-tag">VIP 1+</div>
+                <div class="game-icon">⚡</div>
+                <h3>Zeus Slot</h3>
+                <p>Game dewa Yunani - Minimal VIP 1</p>
+                <span class="game-price">Mulai Rp 2.000</span>
+            </div>
+            <div class="game-card vip-required" onclick="window.location.href='domino.html'">
+                <div class="vip-tag">VIP 2+</div>
+                <div class="game-icon">🀄</div>
+                <h3>Domino</h3>
+                <p>Game kartu klasik - Minimal VIP 2</p>
+                <span class="game-price">Mulai Rp 5.000</span>
+            </div>
+            <div class="game-card vip-only" onclick="window.location.href='spin.html'">
+                <div class="vip-tag">VIP 4 Only</div>
+                <div class="game-icon">🎡</div>
+                <h3>Spin Wheel</h3>
+                <p>Putar roda keberuntungan - Khusus VIP 4</p>
+                <span class="game-price">Mulai Rp 10.000</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP Info -->
+    <section class="vip-info">
+        <h3>Level VIP dan Keberuntungan</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Keberuntungan</th>
+                    <th>Harga</th>
+                    <th>Max Top Up</th>
+                    <th>Game yang Bisa Dimainkan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Reguler</td>
+                    <td>5%</td>
+                    <td>Gratis</td>
+                    <td>Rp 10.000</td>
+                    <td>Duo Facai</td>
+                </tr>
+                <tr>
+                    <td>VIP 1</td>
+                    <td>10%</td>
+                    <td>Rp 25.000</td>
+                    <td>Rp 30.000</td>
+                    <td>Duo Facai, Zeus</td>
+                </tr>
+                <tr>
+                    <td>VIP 2</td>
+                    <td>15%</td>
+                    <td>Rp 75.000</td>
+                    <td>Rp 150.000</td>
+                    <td>Duo Facai, Zeus, Domino</td>
+                </tr>
+                <tr>
+                    <td>VIP 3</td>
+                    <td>20%</td>
+                    <td>Rp 150.000</td>
+                    <td>Rp 500.000</td>
+                    <td>Duo Facai, Zeus, Domino</td>
+                </tr>
+                <tr>
+                    <td>VIP 4</td>
+                    <td>25%</td>
+                    <td>Rp 600.000</td>
+                    <td>Rp 1.000.000+</td>
+                    <td>Semua Game (Termasuk Spin)</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="margin-top: 15px;">* Keberuntungan mempengaruhi peluang menang di semua game</p>
+    </section>
+
+    <!-- Modal Login/Register -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="showTab('login')">Login</button>
+                <button class="tab-btn" onclick="showTab('register')">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h3>Login ke Akun Anda</h3>
+                <input type="text" id="loginUsername" placeholder="Username">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <button class="btn btn-primary" onclick="login()">Login</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <h3>Buat Akun Baru</h3>
+                <input type="text" id="regUsername" placeholder="Username">
+                <input type="email" id="regEmail" placeholder="Email">
+                <input type="password" id="regPassword" placeholder="Password">
+                <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password">
+                <button class="btn btn-primary" onclick="register()">Register</button>
+                <p style="text-align: center; margin-top: 10px; color: #666;">* Keberuntungan awal 5%</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
