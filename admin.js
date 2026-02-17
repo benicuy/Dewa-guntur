@@ -1,7 +1,24 @@
-// Cek admin
-if (!currentUser || !currentUser.isAdmin) {
-    window.location.href = 'index.html';
-}
+// Cek admin - harus dijalankan pertama
+(function checkAdmin() {
+    console.log('Checking admin access...');
+    console.log('Current user:', currentUser);
+    
+    if (!currentUser) {
+        console.log('No user logged in, redirecting...');
+        alert('Silakan login terlebih dahulu!');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    if (!currentUser.isAdmin) {
+        console.log('User is not admin, redirecting...');
+        alert('Anda tidak memiliki akses ke halaman admin!');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    console.log('Admin access granted');
+})();
 
 // Data VIP levels (sama dengan di auth.js)
 const vipLevels = {
@@ -14,6 +31,7 @@ const vipLevels = {
 
 // Load admin data
 function loadAdminData() {
+    console.log('Loading admin data...');
     loadUsers();
     loadTopups();
     loadWithdraws();
@@ -23,6 +41,8 @@ function loadAdminData() {
 
 // Update admin stats
 function updateAdminStats() {
+    console.log('Updating admin stats...');
+    
     const totalUsers = document.getElementById('totalUsers');
     const totalBalance = document.getElementById('totalBalance');
     const totalSpinsAdmin = document.getElementById('totalSpinsAdmin');
@@ -71,11 +91,18 @@ function updateAdminStats() {
 
 // Load users
 function loadUsers() {
+    console.log('Loading users...');
     const usersList = document.getElementById('usersList');
     if (!usersList) return;
 
-    usersList.innerHTML = '';
     const nonAdminUsers = users.filter(u => !u.isAdmin);
+    
+    if (nonAdminUsers.length === 0) {
+        usersList.innerHTML = '<tr><td colspan="8" class="no-data">Tidak ada user terdaftar</td></tr>';
+        return;
+    }
+
+    usersList.innerHTML = '';
 
     nonAdminUsers.forEach(user => {
         const tr = document.createElement('tr');
@@ -88,6 +115,8 @@ function loadUsers() {
             <td>Rp ${(user.balance || 0).toLocaleString('id-ID')}</td>
             <td>${vipName}</td>
             <td>${user.luck || 5}%</td>
+            <td>${user.totalSpins || 0}</td>
+            <td>${user.totalMahjong || 0}</td>
             <td>
                 <div class="admin-actions">
                     <button class="admin-btn edit" onclick="editUserVIP(${user.id})">Edit VIP</button>
@@ -141,24 +170,31 @@ function deleteUser(userId) {
 
 // Load topups
 function loadTopups() {
+    console.log('Loading topups...');
     const topupsList = document.getElementById('topupsList');
     if (!topupsList) return;
 
-    topupsList.innerHTML = '';
+    if (topups.length === 0) {
+        topupsList.innerHTML = '<tr><td colspan="8" class="no-data">Tidak ada request top up</td></tr>';
+        return;
+    }
     
     // Sort by date descending
     topups.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+    topupsList.innerHTML = '';
+
     topups.forEach(topup => {
         const tr = document.createElement('tr');
         const date = new Date(topup.createdAt).toLocaleDateString('id-ID');
+        const transferDate = topup.transferDate ? new Date(topup.transferDate).toLocaleDateString('id-ID') : '-';
         
         let proofHtml = '-';
         if (topup.proofUrl) {
             if (topup.proofUrl.startsWith('data:image')) {
-                proofHtml = `<img src="${topup.proofUrl}" class="proof-thumbnail" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${topup.transferDate}')">`;
+                proofHtml = `<img src="${topup.proofUrl}" class="proof-thumbnail" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${transferDate}')">`;
             } else {
-                proofHtml = `<a href="#" class="proof-link" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${topup.transferDate}')">Lihat</a>`;
+                proofHtml = `<button class="admin-btn view" onclick="viewProof('${topup.proofUrl}', 'Top Up', '${topup.username}', '${topup.amount}', '${topup.method}', '${topup.senderName}', '${transferDate}')">Lihat</button>`;
             }
         }
         
@@ -241,13 +277,19 @@ function rejectTopup(topupId) {
 
 // Load withdraws
 function loadWithdraws() {
+    console.log('Loading withdraws...');
     const withdrawsList = document.getElementById('withdrawsList');
     if (!withdrawsList) return;
 
-    withdrawsList.innerHTML = '';
+    if (withdraws.length === 0) {
+        withdrawsList.innerHTML = '<tr><td colspan="8" class="no-data">Tidak ada request withdraw</td></tr>';
+        return;
+    }
     
     // Sort by date descending
     withdraws.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    withdrawsList.innerHTML = '';
 
     withdraws.forEach(withdraw => {
         const tr = document.createElement('tr');
@@ -331,24 +373,22 @@ function rejectWithdraw(withdrawId) {
 
 // Load VIP requests
 function loadVIPRequests() {
+    console.log('Loading VIP requests...');
     const vipsList = document.getElementById('vipsList');
-    if (!vipsList) {
-        console.log('VIP list element not found');
-        return;
-    }
+    if (!vipsList) return;
 
     const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
-    console.log('VIP Requests:', vipRequests); // Untuk debugging
-    
-    vipsList.innerHTML = '';
+    console.log('VIP Requests:', vipRequests);
     
     if (vipRequests.length === 0) {
-        vipsList.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Tidak ada request VIP</td></tr>';
+        vipsList.innerHTML = '<tr><td colspan="9" class="no-data">Tidak ada request VIP</td></tr>';
         return;
     }
     
     // Sort by date descending
     vipRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    vipsList.innerHTML = '';
 
     vipRequests.forEach(request => {
         const tr = document.createElement('tr');
@@ -362,6 +402,8 @@ function loadVIPRequests() {
             methodDisplay = 'DANA 📱';
         } else if (request.method === 'OVO') {
             methodDisplay = 'OVO 📱';
+        } else if (request.method === 'BCA') {
+            methodDisplay = 'BCA 🏦';
         }
         
         let proofHtml = '-';
@@ -369,7 +411,7 @@ function loadVIPRequests() {
             if (request.proofUrl.startsWith('data:image')) {
                 proofHtml = `<img src="${request.proofUrl}" class="proof-thumbnail" onclick="viewProof('${request.proofUrl}', 'VIP', '${request.username}', '${request.amount}', '${methodDisplay}', '${request.senderName || '-'}', '${transferDate}')">`;
             } else {
-                proofHtml = `<a href="#" class="proof-link" onclick="viewProof('${request.proofUrl}', 'VIP', '${request.username}', '${request.amount}', '${methodDisplay}', '${request.senderName || '-'}', '${transferDate}')">Lihat</a>`;
+                proofHtml = `<button class="admin-btn view" onclick="viewProof('${request.proofUrl}', 'VIP', '${request.username}', '${request.amount}', '${methodDisplay}', '${request.senderName || '-'}', '${transferDate}')">Lihat</button>`;
             }
         }
         
@@ -401,7 +443,7 @@ function loadVIPRequests() {
 
 // Approve VIP
 function approveVIP(requestId) {
-    console.log('Approving VIP request:', requestId); // Untuk debugging
+    console.log('Approving VIP request:', requestId);
     
     const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
     const requestIndex = vipRequests.findIndex(r => r.id === requestId);
@@ -451,7 +493,7 @@ function approveVIP(requestId) {
 
 // Reject VIP
 function rejectVIP(requestId) {
-    console.log('Rejecting VIP request:', requestId); // Untuk debugging
+    console.log('Rejecting VIP request:', requestId);
     
     const vipRequests = JSON.parse(localStorage.getItem('vipRequests')) || [];
     const requestIndex = vipRequests.findIndex(r => r.id === requestId);
@@ -484,6 +526,8 @@ function rejectVIP(requestId) {
 
 // View proof (general function for all proofs)
 function viewProof(proofUrl, type, username, amount, method, senderName, transferDate) {
+    console.log('Viewing proof:', { proofUrl, type, username, amount, method, senderName, transferDate });
+    
     const modal = document.getElementById('proofModal');
     const proofImage = document.getElementById('proofImage');
     const proofInfo = document.getElementById('proofInfo');
@@ -508,7 +552,7 @@ function closeProofModal() {
 
 // Show admin tab
 function showAdminTab(tab) {
-    console.log('Showing tab:', tab); // Untuk debugging
+    console.log('Showing tab:', tab);
     
     const tabs = document.querySelectorAll('.admin-tab');
     const panels = document.querySelectorAll('.admin-panel');
@@ -516,13 +560,24 @@ function showAdminTab(tab) {
     tabs.forEach(t => t.classList.remove('active'));
     panels.forEach(p => p.classList.remove('active'));
     
-    const activeTab = document.querySelector(`[onclick="showAdminTab('${tab}')"]`);
+    // Cari tab yang sesuai
+    let activeTab = null;
+    tabs.forEach(t => {
+        if (t.getAttribute('onclick')?.includes(`'${tab}'`)) {
+            activeTab = t;
+        }
+    });
+    
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+    
     const activePanel = document.getElementById(`${tab}Panel`);
+    if (activePanel) {
+        activePanel.classList.add('active');
+    }
     
-    if (activeTab) activeTab.classList.add('active');
-    if (activePanel) activePanel.classList.add('active');
-    
-    // Reload data for the active tab
+    // Reload data untuk tab yang aktif
     if (tab === 'vips') {
         loadVIPRequests();
     } else if (tab === 'topups') {
@@ -541,11 +596,16 @@ function saveSettings() {
     const minSpin = document.getElementById('minSpin')?.value;
     const maxSpin = document.getElementById('maxSpin')?.value;
 
+    if (!defaultLuck || !bonusAmount || !minSpin || !maxSpin) {
+        showNotification('Semua field harus diisi!', 'error');
+        return;
+    }
+
     const settings = {
-        defaultLuck: parseInt(defaultLuck) || 5,
-        bonusAmount: parseInt(bonusAmount) || 2000,
-        minSpin: parseInt(minSpin) || 10000,
-        maxSpin: parseInt(maxSpin) || 500000
+        defaultLuck: parseInt(defaultLuck),
+        bonusAmount: parseInt(bonusAmount),
+        minSpin: parseInt(minSpin),
+        maxSpin: parseInt(maxSpin)
     };
 
     localStorage.setItem('settings', JSON.stringify(settings));
@@ -590,9 +650,31 @@ function showNotification(message, type) {
     }
 }
 
-// Inisialisasi admin page
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Admin page loaded'); // Untuk debugging
-    loadAdminData();
-    loadSettings();
+// Logout function (dari auth.js)
+function logout() {
+    if (typeof window.logout === 'function') {
+        window.logout();
+    } else {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+    }
+}
+
+// Inisialisasi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Admin page DOM loaded');
+    
+    // Tunggu sebentar untuk memastikan auth.js sudah load
+    setTimeout(() => {
+        // Cek lagi admin setelah auth.js load
+        if (!currentUser || !currentUser.isAdmin) {
+            console.log('Not admin after delay, redirecting...');
+            alert('Anda tidak memiliki akses ke halaman admin!');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        console.log('Loading admin data...');
+        loadAdminData();
+    }, 1000);
 });
